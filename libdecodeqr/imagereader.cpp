@@ -54,8 +54,8 @@ namespace Qr{
     
     void ImageReader::_init()
     {
-        memset(this->_coderegion_vertexes,0,sizeof(CvPoint)*4);
-        memset(this->_finderpattern_boxes,0,sizeof(CvBox2D)*3);
+        memset(this->_coderegion_vertexes,0,sizeof(void)*4);
+        memset(this->_finderpattern_boxes,0,sizeof(void)*3);
 
         this->_img_src_internal=NULL;
         this->_img_src=NULL;
@@ -68,7 +68,7 @@ namespace Qr{
 
         this->_seq_finder_pattern=cvCreateSeq(CV_SEQ_ELTYPE_GENERIC,
                                               sizeof(CvSeq),
-                                              sizeof(CvBox2D),
+                                              sizeof(void),
                                               this->_stor);
         this->_seq_code_area_contour=NULL;
 
@@ -90,7 +90,7 @@ namespace Qr{
         this->_img_tmp_1c=cvCloneImage(this->_img_binarized);
     }
 
-    IplImage *ImageReader::set_image(IplImage *src)
+    void *ImageReader::set_image(void *src)
     {
         this->release_image();
 
@@ -105,7 +105,7 @@ namespace Qr{
         return(this->_img_src);
     }
 
-    IplImage *ImageReader::set_image(int width,int height,
+    void *ImageReader::set_image(int width,int height,
                                      int depth,int channel)
     {
         this->release_image();
@@ -133,27 +133,27 @@ namespace Qr{
     }
 
 
-    IplImage *ImageReader::src_buffer()
+    void *ImageReader::src_buffer()
     {
         return(this->_img_src);
     }
-    IplImage *ImageReader::transformed_buffer()
+    void *ImageReader::transformed_buffer()
     {
         return(this->_img_transformed);
     }
-    IplImage *ImageReader::binarized_buffer()
+    void *ImageReader::binarized_buffer()
     {
         return(this->_img_binarized);
     }
-    IplImage *ImageReader::tmp_buffer()
+    void *ImageReader::tmp_buffer()
     {
         return(this->_img_tmp_1c);
     }
-    CvPoint *ImageReader::coderegion_vertexes()
+    void *ImageReader::coderegion_vertexes()
     {
         return(this->_coderegion_vertexes);
     }
-    CvBox2D *ImageReader::finderpattern_boxes()
+    void *ImageReader::finderpattern_boxes()
     {
         return(this->_finderpattern_boxes);
     }
@@ -183,7 +183,7 @@ namespace Qr{
         return(ret);
     }
 
-    Qr *ImageReader::decode(IplImage *src,
+    Qr *ImageReader::decode(void *src,
                             int adaptive_th_size,
                             int adaptive_th_delta)
     {
@@ -209,8 +209,8 @@ namespace Qr{
             this->qr=NULL;
         }
 
-        memset(this->_coderegion_vertexes,0,sizeof(CvPoint)*4);
-        memset(this->_finderpattern_boxes,0,sizeof(CvBox2D)*3);
+        memset(this->_coderegion_vertexes,0,sizeof(void)*4);
+        memset(this->_finderpattern_boxes,0,sizeof(void)*3);
 
         //
         // binarize
@@ -261,7 +261,7 @@ namespace Qr{
         // perspective transform from source image
         //
         this->_transform_image();
-        IplImage *code_matrix=NULL;
+        void *code_matrix=NULL;
         for(int th=POSTERIZED_TH_LOW;th<=POSTERIZED_TH_HI&&(!code_matrix);
             th+=POSTERIZED_TH_STEP){
             
@@ -297,7 +297,7 @@ namespace Qr{
             }
         }
         
-        IplImage *function_patterns=this->_get_function_patterns();
+        void *function_patterns=this->_get_function_patterns();
 
         this->_unmask_code_matrix(code_matrix,function_patterns);
         this->_read_code_word(code_matrix,function_patterns);
@@ -317,13 +317,13 @@ namespace Qr{
 
     CvSeq *ImageReader::_find_finder_pattern()
     {
-        IplImage *src=this->_img_binarized;
+        void *src=this->_img_binarized;
         cvClearSeq(this->_seq_finder_pattern);
 
         // for contour list
         cvClearMemStorage(this->_stor_tmp);
         CvSeq *cont=cvCreateSeq(CV_SEQ_ELTYPE_POINT,
-                                sizeof(CvSeq),sizeof(CvPoint),
+                                sizeof(CvSeq),sizeof(void),
                                 this->_stor_tmp);
 
         //
@@ -406,7 +406,7 @@ namespace Qr{
             // the most outer squire assumed as position marker.
             //
             if(inner_contour==2){
-                CvBox2D box=cvMinAreaRect2(cand1->contour);
+                void box=cvMinAreaRect2(cand1->contour);
                 cvSeqPush(this->_seq_finder_pattern,&box);
             }
         }
@@ -433,8 +433,8 @@ namespace Qr{
     //
     CvSeq *ImageReader::_find_code_area_contour(double th)
     {
-        IplImage *src=this->_img_binarized;
-        IplImage *mask=this->_img_tmp_1c;
+        void *src=this->_img_binarized;
+        void *mask=this->_img_tmp_1c;
         cvZero(mask);
         
         cvClearMemStorage(this->_stor_tmp);
@@ -442,17 +442,17 @@ namespace Qr{
         //
         // create position maker mask
         //
-        CvBox2D box;
+        void box;
         CvPoint2D32f pt_32f[4];
         CvSeq *markers_vertex=cvCreateSeq(CV_SEQ_ELTYPE_POINT,
                                           sizeof(CvSeq),
-                                          sizeof(CvPoint),
+                                          sizeof(void),
                                           this->_stor_tmp);
         
 
         int c=this->_seq_finder_pattern->total,i;
         for(i=0;i<c;i++){
-            box=*(CvBox2D *)cvGetSeqElem(this->_seq_finder_pattern,i);
+            box=*(void *)cvGetSeqElem(this->_seq_finder_pattern,i);
             this->_finderpattern_boxes[i]=box;
 
             //
@@ -466,7 +466,7 @@ namespace Qr{
             //
             cvBoxPoints(box,pt_32f);
             for(int j=0;j<4;j++){
-                CvPoint p=cvPointFrom32f(pt_32f[j]);
+                void p=cvPointFrom32f(pt_32f[j]);
                 cvSeqPush(markers_vertex,&p);
             }
         }
@@ -482,7 +482,7 @@ namespace Qr{
         // create code area mask
         //
         cvBoxPoints(box,pt_32f);
-        CvPoint *points=new CvPoint[4];
+        void *points=new void[4];
         for(i=0;i<4;i++){
             points[i]=cvPointFrom32f(pt_32f[i]);
         }
@@ -501,7 +501,7 @@ namespace Qr{
         // get contours of masked image
         //
         CvSeq *cont=cvCreateSeq(CV_SEQ_ELTYPE_POINT,
-                                sizeof(CvSeq),sizeof(CvPoint),
+                                sizeof(CvSeq),sizeof(void),
                                 this->_stor_tmp);
         cvFindContours(mask,cont->storage,&cont,sizeof(CvContour),
                        CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE,cvPoint(0,0));
@@ -510,13 +510,13 @@ namespace Qr{
         // calcurate convex hull that assumed as code area
         //
         CvSeq *pts=cvCreateSeq(CV_SEQ_ELTYPE_POINT,
-                               sizeof(CvSeq),sizeof(CvPoint),
+                               sizeof(CvSeq),sizeof(void),
                                this->_stor_tmp);
         CvSeq *cont_head=cont;
         for(;cont;cont=cont->h_next){
             int c=cont->total;
             for(i=0;i<c;i++){
-                CvPoint pt=*((CvPoint *)cvGetSeqElem(cont,i));
+                void pt=*((void *)cvGetSeqElem(cont,i));
                 cvSeqPush(pts,&pt);
             }
             cvClearSeq(cont);
@@ -537,8 +537,8 @@ namespace Qr{
             int hullcount=hull->total;
             CvMat* vector=cvCreateMat(1,hullcount,CV_32SC2);
             for(i=0;i<hullcount;i++ ){
-                CV_MAT_ELEM(*vector,CvPoint,0,i)=
-                    **CV_GET_SEQ_ELEM(CvPoint*,hull,i);
+                CV_MAT_ELEM(*vector,void,0,i)=
+                    **CV_GET_SEQ_ELEM(void*,hull,i);
             }
             CvContour header;
             CvSeqBlock block;
@@ -558,8 +558,8 @@ namespace Qr{
 
     CvRect ImageReader::_transform_image()
     {
-        IplImage *src=this->_img_src;
-        IplImage *dst=this->_img_transformed;
+        void *src=this->_img_src;
+        void *dst=this->_img_transformed;
         cvResetImageROI(dst);
 
         //
@@ -572,7 +572,7 @@ namespace Qr{
         cog.y=0.0F;
         for(i=0;i<c;i++){
             CvPoint2D32f p=cvPointTo32f(
-                *(CvPoint *)cvGetSeqElem(this->_seq_code_area_contour,i));
+                *(void *)cvGetSeqElem(this->_seq_code_area_contour,i));
             cog.x+=p.x;
             cog.y+=p.y;
         }
@@ -601,7 +601,7 @@ namespace Qr{
         fprintf(stderr,"target region: ");
 #endif
         for(i=0;i<c;i++){
-            this->_coderegion_vertexes[i]=*(CvPoint *)cvGetSeqElem(
+            this->_coderegion_vertexes[i]=*(void *)cvGetSeqElem(
                 this->_seq_code_area_contour,i);
             spts[i]=cvPointTo32f(this->_coderegion_vertexes[i]);
             
@@ -676,9 +676,9 @@ namespace Qr{
                                                int low_th,
                                                int hi_th)
     {
-        IplImage *src=this->_img_transformed;
-        IplImage *dst=this->_img_binarized;
-        IplImage *buf=this->_img_tmp_1c;
+        void *src=this->_img_transformed;
+        void *dst=this->_img_binarized;
+        void *buf=this->_img_tmp_1c;
 
         CvRect roi=cvGetImageROI(src);
         cvSetImageROI(buf,roi);
@@ -737,9 +737,9 @@ namespace Qr{
     }
     
     
-    IplImage *ImageReader::_get_code_matrix()
+    void *ImageReader::_get_code_matrix()
     {
-        IplImage *src=this->_img_binarized;
+        void *src=this->_img_binarized;
 
         double cell_size=this->_get_cell_size();
         if(cell_size<=0.0)
@@ -749,7 +749,7 @@ namespace Qr{
         int version=(int)(((double)roi.width/cell_size-17.0)/4.0);
         int w=4*version+17;
         
-        IplImage *dst=cvCreateImage(cvSize(w,w),IPL_DEPTH_8U,1);
+        void *dst=cvCreateImage(cvSize(w,w),IPL_DEPTH_8U,1);
         cvResize(src,dst);
         
         
@@ -760,7 +760,7 @@ namespace Qr{
         return(dst);
     }
 
-    int ImageReader::_get_format_info(IplImage *src,int pos)
+    int ImageReader::_get_format_info(void *src,int pos)
     {
         unsigned int raw_data=0;
         this->qr->init_each_formatinfo_pattern_pixel();
@@ -808,9 +808,9 @@ namespace Qr{
         return(ret);
     }
 
-    IplImage *ImageReader::_get_function_patterns()
+    void *ImageReader::_get_function_patterns()
     {
-        IplImage *buf=cvCreateImage(cvSize(this->qr->cells_par_side,
+        void *buf=cvCreateImage(cvSize(this->qr->cells_par_side,
                                            this->qr->cells_par_side),
                                     IPL_DEPTH_8U,1);
         cvZero(buf);
@@ -826,11 +826,11 @@ namespace Qr{
         return(buf);
     }
 
-    void ImageReader::_unmask_code_matrix(IplImage *src,
-                                          IplImage *function_patterns)
+    void ImageReader::_unmask_code_matrix(void *src,
+                                          void *function_patterns)
     {
-        IplImage *mask=this->_get_mask_pattern();
-        IplImage *unproc=cvCloneImage(mask);
+        void *mask=this->_get_mask_pattern();
+        void *unproc=cvCloneImage(mask);
 
         cvAnd(function_patterns,unproc,unproc);
         cvXor(src,mask,src,unproc);
@@ -839,15 +839,15 @@ namespace Qr{
         cvReleaseImage(&mask);
     }
 
-    int ImageReader::_read_code_word(IplImage *src,IplImage *mask)
+    int ImageReader::_read_code_word(void *src,void *mask)
     {
         //
         // erace timing pattern
         //
-        IplImage *codes=cvCreateImage(cvSize(src->width-1,src->height-1),
+        void *codes=cvCreateImage(cvSize(src->width-1,src->height-1),
                                       IPL_DEPTH_8U,1);
         cvZero(codes);
-        IplImage *funcs=cvCloneImage(codes);
+        void *funcs=cvCloneImage(codes);
         
         CvRect roi=cvGetImageROI(src);
         
@@ -973,7 +973,7 @@ namespace Qr{
     //
     double ImageReader::_get_cell_size()
     {
-        IplImage *src=this->_img_binarized;
+        void *src=this->_img_binarized;
         this->_find_finder_pattern();
             
         int c=this->_seq_finder_pattern->total;
@@ -982,7 +982,7 @@ namespace Qr{
 
         double cell_size=0.0;
         for(int i=0;i<c;i++){
-            CvBox2D box=*(CvBox2D *)cvGetSeqElem(this->_seq_finder_pattern,
+            void box=*(void *)cvGetSeqElem(this->_seq_finder_pattern,
                                                  i);
             cell_size+=box.size.width+box.size.height;
         }
@@ -996,9 +996,9 @@ namespace Qr{
     //
     // 
     //
-    IplImage *ImageReader::_get_mask_pattern()
+    void *ImageReader::_get_mask_pattern()
     {
-        IplImage *mask=cvCreateImage(cvSize(this->qr->cells_par_side,
+        void *mask=cvCreateImage(cvSize(this->qr->cells_par_side,
                                             this->qr->cells_par_side),
                                      IPL_DEPTH_8U,1);
         cvZero(mask);
@@ -1024,8 +1024,8 @@ namespace Qr{
     //
     static int seq_cmp_by_clockwise(const void *_a,const void *_b,void *_cog)
     {
-        CvPoint* a = (CvPoint*)_a;
-        CvPoint* b = (CvPoint*)_b;
+        void* a = (void*)_a;
+        void* b = (void*)_b;
         CvPoint2D32f *cog=(CvPoint2D32f *)_cog;
         
         float aa=cvFastArctan((float)(a->y)-cog->y,cog->x-(float)(a->x));

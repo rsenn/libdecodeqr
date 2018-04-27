@@ -61,29 +61,29 @@ QrDecoderHandle qr_decoder_set_image_size(QrDecoderHandle decoder,
 }
 
 
-IplImage *qr_decoder_get_image_buffer(QrDecoderHandle decoder)
+void *qr_decoder_get_image_buffer(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->src_buffer());
 }
-IplImage *qr_decoder_get_transformed_image_buffer(QrDecoderHandle decoder)
+void *qr_decoder_get_transformed_image_buffer(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->transformed_buffer());
 }
-IplImage *qr_decoder_get_binarized_image_buffer(QrDecoderHandle decoder)
+void *qr_decoder_get_binarized_image_buffer(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->binarized_buffer());
 }
-IplImage *qr_decoder_get_tmp_image_buffer(QrDecoderHandle decoder)
+void *qr_decoder_get_tmp_image_buffer(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->tmp_buffer());
 }
 
 QrDecoderHandle qr_decoder_set_image_buffer(QrDecoderHandle decoder,
-                                            IplImage *src)
+                                            void *src)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
      imagereader->set_image(src);
@@ -101,7 +101,7 @@ short qr_decoder_decode(QrDecoderHandle decoder,
 }    
 
 short qr_decoder_decode_image(QrDecoderHandle decoder,
-                              IplImage *src,
+                              void *src,
                               int adaptive_th_size,
                               int adaptive_th_delta)
 {
@@ -146,13 +146,13 @@ int qr_decoder_get_body(QrDecoderHandle decoder,
     return(size);
 }
 
-CvPoint *qr_decoder_get_coderegion_vertexes(QrDecoderHandle decoder)
+void *qr_decoder_get_coderegion_vertexes(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->coderegion_vertexes());
 }
 
-CvBox2D *qr_decoder_get_finderpattern_boxes(QrDecoderHandle decoder)
+void *qr_decoder_get_finderpattern_boxes(QrDecoderHandle decoder)
 {
     Qr::ImageReader *imagereader=(Qr::ImageReader *)decoder;
     return(imagereader->finderpattern_boxes());

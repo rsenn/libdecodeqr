@@ -118,13 +118,13 @@ extern QrDecoderHandle qr_decoder_set_image_size(
 //
 // ARGS:
 //   QrDecoderHandle decoder: handler
-//   IplImage *src: source image
+//   void *src: source image
 //
 // RETURN:
 //   QrDecoderHandle handle
 //
 extern QrDecoderHandle qr_decoder_set_image_buffer(
-    QrDecoderHandle decoder,IplImage *src);
+    QrDecoderHandle decoder,void *src);
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -134,18 +134,18 @@ extern QrDecoderHandle qr_decoder_set_image_buffer(
 //   QrDecoderHandle decoder: handler
 //
 // RETURN:
-//   IplImage *: pointer to buffer source image|NULL
+//   void *: pointer to buffer source image|NULL
 //
 // NOTE:
-//   See OpenCV reference manual to access to IplImage *
+//   See OpenCV reference manual to access to void *
 //
-extern IplImage *qr_decoder_get_image_buffer(QrDecoderHandle decoder);
+extern void *qr_decoder_get_image_buffer(QrDecoderHandle decoder);
 
-extern IplImage *qr_decoder_get_transformed_image_buffer(
+extern void *qr_decoder_get_transformed_image_buffer(
     QrDecoderHandle decoder);
-extern IplImage *qr_decoder_get_binarized_image_buffer(
+extern void *qr_decoder_get_binarized_image_buffer(
     QrDecoderHandle decoder);
-extern IplImage *qr_decoder_get_tmp_image_buffer(
+extern void *qr_decoder_get_tmp_image_buffer(
     QrDecoderHandle decoder);
 
 /////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ extern short qr_decoder_decode(QrDecoderHandle decoder,
 //
 // ARGS:
 //   QrDecoderHandle decoder: handler
-//   IplImage *src: image to decode
+//   void *src: image to decode
 //   int adaptive_th_size: value of AdaptiveThreshold size
 //   int adaptive_th_delta: value of AdaptiveThreshold delta
 //
@@ -194,14 +194,14 @@ extern short qr_decoder_decode(QrDecoderHandle decoder,
 //
 #ifdef __cplusplus
 extern short qr_decoder_decode_image(QrDecoderHandle decoder,
-                                     IplImage *src,
+                                     void *src,
                                      int adaptive_th_size=
                                      DEFAULT_ADAPTIVE_TH_SIZE,
                                      int adaptive_th_delta=
                                      DEFAULT_ADAPTIVE_TH_DELTA);
 #else
 extern short qr_decoder_decode_image(QrDecoderHandle decoder,
-                                     IplImage *src,
+                                     void *src,
                                      int adaptive_th_size,
                                      int adaptive_th_delta);
 #endif

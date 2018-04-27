@@ -38,9 +38,11 @@ fi
 
 CPPFLAGS="$CPPFLAGS -fpermissive"
 
-PKG_CHECK_MODULES([DEPS], [opencv])
+PKG_CHECK_MODULES([DEPS], [opencv], [have_opencv=yes],[have_opencv=no])
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LDFLAGS)
+
+AM_CONDITIONAL([OPENCV],[test "$have_opencv" = yes])
 
 # Checks for header files.
 AC_CHECK_HEADERS([memory.h netinet/in.h])
